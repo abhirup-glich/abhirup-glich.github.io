@@ -84,7 +84,7 @@ export async function fetchStartups(): Promise<StartupItem[]> {
       return data;
     }
     return DEFAULT_STARTUPS;
-  } catch (err) {
+  } catch {
     return DEFAULT_STARTUPS;
   }
 }
@@ -98,7 +98,7 @@ export async function fetchPublishedProjects(): Promise<ProjectItem[]> {
       return data;
     }
     return DEFAULT_PROJECTS;
-  } catch (err) {
+  } catch {
     return DEFAULT_PROJECTS;
   }
 }
@@ -117,7 +117,7 @@ export async function fetchSession(): Promise<AuthSession | null> {
       return session;
     }
     return null;
-  } catch (err) {
+  } catch {
     return null;
   }
 }
@@ -166,7 +166,7 @@ export async function signOutAdmin(): Promise<void> {
     });
 
     window.location.href = "/admin";
-  } catch (err) {
+  } catch {
     window.location.reload();
   }
 }
