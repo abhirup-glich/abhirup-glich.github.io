@@ -1,0 +1,33 @@
+{
+  "startups": [
+    {
+      "id": "virtual-valley",
+      "name": "Virtual Valley",
+      "status": "Established",
+      "link": "https://virtual-valley.vercel.app",
+      "accent_color": "monochrome",
+      "description": "A premium digital agency specializing in high-performance web development, bespoke UI/UX architecture, and digital media production.",
+      "view1_name": "Total Clients",
+      "view1_value": "50+",
+      "view2_name": "Delivered Projects",
+      "view2_value": "120+",
+      "button_text": "Visit Virtual Valley",
+      "order": "left"
+    },
+    {
+      "id": "tipflow",
+      "name": "TipFlow",
+      "status": "Under Establishment",
+      "link": "https://tipflowapp.vercel.app",
+      "accent_color": "orange",
+      "description": "Control beyond touch. Next-generation computer control, spatial interaction, and offline-first workflow automation.",
+      "view1_name": "Current Release",
+      "view1_value": "v4.2.2",
+      "view2_name": "Architecture",
+      "view2_value": "100% Offline",
+      "button_text": "Visit TipFlow",
+      "order": "right"
+    }
+  ],
+  "projects": []
+}
