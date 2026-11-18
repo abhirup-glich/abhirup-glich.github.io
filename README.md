@@ -1,75 +1,41 @@
-# React + TypeScript + Vite
+# Abhirup Sarkar's portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React, TypeScript, and Vite portfolio published at **https://abhirup-glich.github.io/**.
 
-Currently, two official plugins are available:
+## GitHub Pages deployment
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+In this repository's **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**. This is a one-time repository setting.
 
-## React Compiler
+The `Deploy portfolio to GitHub Pages` workflow runs on every push to `main`, or manually from the Actions tab. It installs the locked dependencies with Node.js 24, checks the static data export, builds the app, and deploys only `dist/` using GitHub's Pages actions. No deployment secret or custom domain is needed.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+The Vite base is `/` because this repository is the user's root site.
 
-Note: This will impact Vite dev & build performances.
+## Content updates
 
-## Expanding the ESLint configuration
+Edit `data/portfolio-store.json` and push to `main` to publish changes. The Pages build exports startup data and only published projects, ordered by `display_order`, into static JSON files. The public site reads those files instead of calling server APIs. The existing external project feed continues to work.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+GitHub Pages hosts static files and cannot run the `api/` backend or Google sign-in. On Pages, `/admin/` links to the repository content editor. The existing backend and admin portal remain available when running on a server-capable host.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Local development
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Requires Node.js 24 and npm.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm ci
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+For a production Pages preview:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```sh
+npm run build:pages
+npm run preview
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Validation:
+
+```sh
+node --test scripts/prepare-pages.test.mjs
+npm test
+npm run build:pages
 ```

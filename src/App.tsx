@@ -2,6 +2,7 @@ import { useState, Suspense, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLoading } from "./lib/LoadingContext";
 import { cn } from "./lib/utils";
+import { IS_GITHUB_PAGES } from "./lib/api";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -54,6 +55,16 @@ function App() {
 
   // If on /admin route, display the isolated Admin portal without public portfolio layout
   if (isAdminRoute) {
+    if (IS_GITHUB_PAGES) {
+      return (
+        <main className="admin-mode min-h-screen bg-black text-white flex flex-col items-center justify-center gap-6 p-8 text-center">
+          <h1 className="text-3xl font-bold">Portfolio administration</h1>
+          <p>Content updates for this site are managed through the GitHub repository.</p>
+          <a className="underline" href="https://github.com/abhirup-glich/abhirup-glich.github.io/edit/main/data/portfolio-store.json">Edit portfolio content on GitHub</a>
+          <a className="underline" href="/">Back to portfolio</a>
+        </main>
+      );
+    }
     return (
       <div className="admin-mode min-h-screen">
         <Suspense fallback={

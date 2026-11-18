@@ -72,12 +72,14 @@ export const DEFAULT_STARTUPS: StartupItem[] = [
 
 export const DEFAULT_PROJECTS: ProjectItem[] = [];
 
+export const IS_GITHUB_PAGES = import.meta.env.VITE_GITHUB_PAGES === "true";
+
 // ---------------------------------------------------------------------------
 // Public API Calls
 // ---------------------------------------------------------------------------
 export async function fetchStartups(): Promise<StartupItem[]> {
   try {
-    const res = await fetch("/api/startups");
+    const res = await fetch(IS_GITHUB_PAGES ? "/data/startups.json" : "/api/startups");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
@@ -91,7 +93,7 @@ export async function fetchStartups(): Promise<StartupItem[]> {
 
 export async function fetchPublishedProjects(): Promise<ProjectItem[]> {
   try {
-    const res = await fetch("/api/projects");
+    const res = await fetch(IS_GITHUB_PAGES ? "/data/projects.json" : "/api/projects");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (Array.isArray(data)) {
@@ -107,6 +109,7 @@ export async function fetchPublishedProjects(): Promise<ProjectItem[]> {
 // Auth.js Session & Google Sign-In
 // ---------------------------------------------------------------------------
 export async function fetchSession(): Promise<AuthSession | null> {
+  if (IS_GITHUB_PAGES) return null;
   try {
     const res = await fetch("/api/auth/session", {
       credentials: "same-origin",

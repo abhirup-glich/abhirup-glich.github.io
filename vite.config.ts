@@ -54,12 +54,15 @@ function devApiPlugin(): Plugin {
 
 // https://vite.dev/config/
 export default defineConfig({
+  // This is a user Pages site at https://abhirup-glich.github.io/.
+  base: '/',
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     devApiPlugin(),
   ],
   test: {
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
