@@ -48,7 +48,7 @@ function Counter({ value, duration = 2 }: { value: string, duration?: number }) 
 const startups = [
   {
     title: "Buggy But Brilliant",
-    description: "A Brilliant agency to built and create websites, videos and digital designs. We built and deliver.",
+    description: "A digital agency building high-performance websites, applications and digital platforms.",
     stats: [
       { label: "Total Customers", value: "2500+", icon: Users },
       { label: "Total Products Delivered", value: "850+", icon: Package },
@@ -59,7 +59,7 @@ const startups = [
   },
   {
     title: "AbSa Studio",
-    description: "A creative digital agency specializing in video production, motion graphics, high-end visual storytelling & more.",
+    description: "A digital studio specializing in software engineering, AI solutions & interactive interfaces.",
     stats: [
       { label: "Total Views", value: "0", icon: Eye },
       { label: "Subscribers", value: "0", icon: Heart },

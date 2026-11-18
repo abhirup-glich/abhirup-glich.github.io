@@ -8,3 +8,4 @@ class MockIntersectionObserver {
 }
 
 vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
+window.scrollTo = vi.fn();

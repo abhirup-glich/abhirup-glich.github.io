@@ -1,108 +1,103 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import ProjectPage from '../components/ProjectPage';
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import ProjectDetail from "../components/ProjectDetail";
+import ProjectPage from "../components/ProjectPage";
+import { projectsData } from "../data/projects";
 
-// Helper to create a mock response
-const createMockResponse = (data: unknown, ok = true, status = 200) => ({
-  ok,
-  status,
-  json: () => Promise.resolve(data),
-});
-
-describe('ProjectPage Component Robustness', () => {
+describe("ProjectPage and ProjectDetail Robustness", () => {
   const onBackMock = vi.fn();
+  const onSelectMock = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Stub IntersectionObserver as it's not in JSDOM
-    vi.stubGlobal('IntersectionObserver', class {
-      observe = vi.fn();
-      disconnect = vi.fn();
-      unobserve = vi.fn();
-    });
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        observe = vi.fn();
+        disconnect = vi.fn();
+        unobserve = vi.fn();
+      }
+    );
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('renders loading state correctly and then displays projects', async () => {
-    const mockData = [
-      { title: 'Project 1', description: 'Desc 1', category: 'Coding', image: 'img1.jpg', video: 'vid1' },
-      { title: 'Project 2', description: 'Desc 2', category: 'Design', image: 'img2.jpg', video: 'vid2' }
-    ];
+  it("renders project detail information accurately without crashing", () => {
+    const tipflow = projectsData.find((p) => p.slug === "tipflow")!;
+    expect(tipflow).toBeDefined();
 
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createMockResponse(mockData)));
+    render(
+      <ProjectDetail
+        project={tipflow}
+        onBack={onBackMock}
+        onSelectProject={onSelectMock}
+      />
+    );
 
-    render(<ProjectPage onBack={onBackMock} />);
+    // Verify Title, Category, and Overview
+    expect(screen.getByRole("heading", { name: "TipFlow", level: 1 })).toBeInTheDocument();
+    expect(screen.getAllByText("Applications & Software").length).toBeGreaterThan(0);
+    expect(screen.getByText("Project Overview")).toBeInTheDocument();
 
-    // Verify loading skeletons are present
-    expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    // Verify Implemented Features are shown
+    expect(screen.getByText("Key Features")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Real-time webcam hand tracking and landmark extraction/i)
+    ).toBeInTheDocument();
 
-    // Wait for projects to load
-    await waitFor(() => {
-      expect(screen.getByText('Project 1')).toBeInTheDocument();
-      expect(screen.getByText('Project 2')).toBeInTheDocument();
-    });
+    // Verify verified external links are rendered
+    const liveLink = screen.getByRole("link", { name: /Visit Live Website/i });
+    expect(liveLink).toHaveAttribute("href", "https://tipflowapp.vercel.app/");
 
-    // Check category filter buttons (using getAllByText because 'Coding' appears in filter button, select option, and card tag)
-    expect(screen.getAllByText('Coding').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Design').length).toBeGreaterThan(0);
+    // Verify unverified GitHub link is NOT rendered
+    expect(screen.queryByRole("link", { name: /View Repository/i })).not.toBeInTheDocument();
   });
 
-  it('handles fetch errors gracefully and shows error message', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createMockResponse(null, false, 500)));
+  it("omits live website and repository buttons when no verified links exist", () => {
+    // F.A.S.T. prototype has no public URL
+    const fastProject = projectsData.find(
+      (p) => p.slug === "fast-facial-attendance-system"
+    )!;
+    expect(fastProject).toBeDefined();
 
-    render(<ProjectPage onBack={onBackMock} />);
+    render(
+      <ProjectDetail
+        project={fastProject}
+        onBack={onBackMock}
+        onSelectProject={onSelectMock}
+      />
+    );
 
-    await waitFor(() => {
-      expect(screen.getByText(/Failed to fetch projects/i)).toBeInTheDocument();
-    });
-
-    // Verify "Try Again" button exists
-    expect(screen.getByText('Try Again')).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "F.A.S.T. — Facial Attendance System", level: 1 })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Visit Live Website/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /View Repository/i })).not.toBeInTheDocument();
   });
 
-  it('filters projects by search query', async () => {
-    const mockData = [
-      { title: 'Unique App', description: 'Desc 1', category: 'Coding', image: 'img1.jpg', video: 'vid1' },
-      { title: 'Other Tool', description: 'Desc 2', category: 'Design', image: 'img2.jpg', video: 'vid2' }
-    ];
+  it("triggers back navigation on clicking the back button", () => {
+    const project = projectsData[0];
+    render(
+      <ProjectDetail
+        project={project}
+        onBack={onBackMock}
+        onSelectProject={onSelectMock}
+      />
+    );
 
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createMockResponse(mockData)));
+    const backButton = screen.getByRole("button", { name: /Back to projects/i });
+    fireEvent.click(backButton);
 
-    render(<ProjectPage onBack={onBackMock} />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Unique App')).toBeInTheDocument();
-    });
-
-    const searchInput = screen.getByPlaceholderText(/Search projects/i);
-    fireEvent.change(searchInput, { target: { value: 'Unique' } });
-
-    expect(screen.getByText('Unique App')).toBeInTheDocument();
-    expect(screen.queryByText('Other Tool')).not.toBeInTheDocument();
+    expect(onBackMock).toHaveBeenCalledTimes(1);
   });
 
-  it('handles category filtering', async () => {
-    const mockData = [
-      { title: 'Coding Project', description: 'Desc 1', category: 'Coding', image: 'img1.jpg', video: 'vid1' },
-      { title: 'Design Project', description: 'Desc 2', category: 'Design', image: 'img2.jpg', video: 'vid2' }
-    ];
-
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createMockResponse(mockData)));
-
-    render(<ProjectPage onBack={onBackMock} />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Coding Project')).toBeInTheDocument();
+  it("renders all 47 projects cleanly through ProjectPage wrapper without runtime exceptions", () => {
+    projectsData.forEach((proj) => {
+      const { unmount } = render(
+        <ProjectPage project={proj} onBack={onBackMock} />
+      );
+      expect(screen.getByRole("heading", { name: proj.title, level: 1 })).toBeInTheDocument();
+      unmount();
     });
-
-    // Find and click Design filter button
-    const designButton = screen.getByRole('button', { name: 'Design' });
-    fireEvent.click(designButton);
-
-    expect(screen.getByText('Design Project')).toBeInTheDocument();
-    expect(screen.queryByText('Coding Project')).not.toBeInTheDocument();
   });
 });

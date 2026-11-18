@@ -8,7 +8,7 @@ export default function Footer() {
             <span className="font-bold text-xl tracking-tight">Abhirup Sarkar.</span>
           </div>
           <p className="text-gray-500 text-sm font-medium tracking-widest uppercase">
-            Cyber Security & Digital Creator
+            Software Developer & Cybersecurity Architect
           </p>
         </div>
         
@@ -17,8 +17,8 @@ export default function Footer() {
         </div>
         
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
-          <a href="#" className="text-[10px] md:text-xs font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-[0.2em] py-2">
-            Visit my Editing Website
+          <a href="https://tipflowapp.vercel.app" target="_blank" rel="noopener noreferrer" className="text-[10px] md:text-xs font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-[0.2em] py-2">
+            Visit TipFlow
           </a>
           <a href="#" className="text-[10px] md:text-xs font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-[0.2em] py-2">
             Terms of Service

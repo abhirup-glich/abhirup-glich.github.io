@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import StartupsSection from "../components/StartupsSection";
 import Projects from "../components/Projects";
 import Navbar from "../components/Navbar";
 import { ALLOWED_ADMIN_EMAIL, DEFAULT_STARTUPS, fetchSession } from "../lib/api";
 import * as loadingContext from "../lib/LoadingContext";
+import { projectsData, TOTAL_PROJECTS_COUNT } from "../data/projects";
 
 // Stub IntersectionObserver & matchMedia for jsdom
 beforeEach(() => {
@@ -64,20 +65,78 @@ describe("1. Startups Section Target Requirements", () => {
   });
 });
 
-describe("2. Projects Section & Under Construction Loop", () => {
-  it("renders the looping under construction state when there are zero published projects", async () => {
-    render(<Projects />);
+describe("2. Project Explorer & 47 Projects Data Integrity", () => {
+  it("contains exactly 47 unique projects in the dataset", () => {
+    expect(TOTAL_PROJECTS_COUNT).toBe(47);
+    expect(projectsData).toHaveLength(47);
 
-    await waitFor(() => {
-      expect(screen.getByText("PROJECTS")).toBeInTheDocument();
-      expect(screen.getByText("Projects Are Taking Shape")).toBeInTheDocument();
-      expect(screen.getByText(/Projects are taking shape\. Check back soon/i)).toBeInTheDocument();
-      expect(screen.getByText("In Active Development")).toBeInTheDocument();
-    });
+    const ids = new Set(projectsData.map((p) => p.id));
+    expect(ids.size).toBe(47);
 
-    // Verify fake projects are not rendered
-    expect(screen.queryByText("Photo Editing")).not.toBeInTheDocument();
-    expect(screen.queryByText("Video Editing")).not.toBeInTheDocument();
+    const slugs = new Set(projectsData.map((p) => p.slug));
+    expect(slugs.size).toBe(47);
+
+    // Verify video/photo editing standalone projects have been completely eliminated
+    expect(ids.has("personal-photo-portrait-editing")).toBe(false);
+    expect(ids.has("brill-chocolate-ad")).toBe(false);
+    expect(ids.has("brill-hotel-story")).toBe(false);
+  });
+
+  it("prioritizes exactly 10 featured projects", () => {
+    const featuredProjects = projectsData.filter((p) => p.featured);
+    expect(featuredProjects).toHaveLength(10);
+
+    const featuredSlugs = featuredProjects.map((p) => p.slug);
+    expect(featuredSlugs).toContain("tipflow");
+    expect(featuredSlugs).toContain("glo-desktop-companion");
+    expect(featuredSlugs).toContain("fast-facial-attendance-system");
+    expect(featuredSlugs).toContain("parakotha");
+    expect(featuredSlugs).toContain("hotel-simvo-website");
+    expect(featuredSlugs).toContain("snapodr");
+    expect(featuredSlugs).toContain("virtual-valley");
+    expect(featuredSlugs).toContain("abhirup-personal-portfolio");
+    expect(featuredSlugs).toContain("network-device-management-poc");
+    expect(featuredSlugs).toContain("omnidimension-calling-automation");
+  });
+
+  it("renders the new Project Explorer with correct heading, subtitle, and live count", () => {
+    const onProjectClick = vi.fn();
+    render(<Projects onProjectClick={onProjectClick} />);
+
+    expect(screen.getByText("SELECTED WORK & EXPERIMENTS")).toBeInTheDocument();
+    expect(
+      screen.getByText(/From intelligent desktop applications and computer vision/i)
+    ).toBeInTheDocument();
+
+    // Verify old Under Construction state is completely removed
+    expect(screen.queryByText("Projects Are Taking Shape")).not.toBeInTheDocument();
+    expect(screen.queryByText("In Active Development")).not.toBeInTheDocument();
+  });
+
+  it("filters projects by search query in the Project Explorer", () => {
+    const onProjectClick = vi.fn();
+    render(<Projects onProjectClick={onProjectClick} initialCategory="All" />);
+
+    const searchInput = screen.getByPlaceholderText(/Search by project name/i);
+    fireEvent.change(searchInput, { target: { value: "MediaPipe" } });
+
+    // TipFlow uses MediaPipe and should be displayed
+    expect(screen.getByText("TipFlow")).toBeInTheDocument();
+
+    // Unrelated project should not be visible
+    expect(screen.queryByText("Hotel Simvo Website")).not.toBeInTheDocument();
+  });
+
+  it("filters projects by category", () => {
+    const onProjectClick = vi.fn();
+    render(<Projects onProjectClick={onProjectClick} initialCategory="All" />);
+
+    // Click Cybersecurity & Networking category button
+    const cyberButton = screen.getByRole("button", { name: "Cybersecurity & Networking" });
+    fireEvent.click(cyberButton);
+
+    expect(screen.getByText("Network Device Management PoC")).toBeInTheDocument();
+    expect(screen.queryByText("Hotel Simvo Website")).not.toBeInTheDocument();
   });
 });
 
@@ -87,7 +146,6 @@ describe("3. Admin Authentication & Authorization Layer", () => {
   });
 
   it("rejects unauthorized access when session is empty or unauthenticated", async () => {
-    // Stub fetch to return 401 unauthorized session
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -104,7 +162,6 @@ describe("3. Admin Authentication & Authorization Layer", () => {
 
 describe("4. Navbar Updates", () => {
   it("displays Abhirup Sarkar as the portfolio owner name", () => {
-    // Mock LoadingContext so Navbar is rendered (state === 'complete')
     vi.spyOn(loadingContext, "useLoading").mockReturnValue({
       state: "complete",
       setState: vi.fn(),
@@ -112,11 +169,8 @@ describe("4. Navbar Updates", () => {
 
     render(<Navbar />);
 
-    // Navbar should have "ABHIRUP SARKAR."
     const ownerNameMatches = screen.getAllByText(/ABHIRUP SARKAR/i);
     expect(ownerNameMatches.length).toBeGreaterThan(0);
-
-    // Verify rotating buttons match the two startups
     expect(screen.getByText("Virtual Valley →")).toBeInTheDocument();
   });
 });

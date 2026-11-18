@@ -764,7 +764,7 @@ export default function AdminPage() {
                       <option value="AI">AI & Automation</option>
                       <option value="Cybersecurity">Cybersecurity</option>
                       <option value="Design">UI/UX Design</option>
-                      <option value="Editing">Video Editing</option>
+                      <option value="Apps">Applications & Software</option>
                     </select>
                   </div>
 

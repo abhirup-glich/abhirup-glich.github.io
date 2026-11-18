@@ -45,9 +45,9 @@ export default function TerminalPopup() {
 
   const commands: Record<string, string | (() => string) | { name: string; href: string }[]> = {
     help: "Available commands: about, skills, projects, socials, studio, contact, clear, history, exit",
-    about: "ABHIRUP SARKAR - Cybersecurity Architect, Digital Creator & Developer. Specializing in ethical hacking, high-end video editing, and crafting stunning UI/UX experiences.",
-    skills: "CORE STACK: Python, React, GSAP, Tailwind, Node.js, Capcut Pro, Adobe Premiere Pro, Kali Linux, Metasploit, Wireshark.",
-    projects: "RECENT WORK: [1] AI-Driven Threat Detector, [2] Cinematic Portfolio, [3] Network Vulnerability Scanner. (Type 'visit projects' to view)",
+    about: "ABHIRUP SARKAR — Software Developer, AI Engineer & Cybersecurity Analyst. Specializing in ethical hacking, full-stack systems, computer vision, and crafting intuitive UI/UX experiences.",
+    skills: "CORE STACK: Python, TypeScript, React, Next.js, OpenCV, MediaPipe, Supabase, Docker, Linux, Metasploit, Wireshark.",
+    projects: "PROJECT ARCHIVE: Curated projects spanning Applications & Software, AI & Automation, Web Dev, Cybersecurity, and Startups. (Type 'visit projects' to view)",
     socials: [
       { name: "Instagram", href: "https://www.instagram.com/itz_abhirupsarkar" },
       { name: "LinkedIn", href: "https://www.linkedin.com/in/abhirup-sarkar-2b746939b" },

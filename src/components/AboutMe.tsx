@@ -60,8 +60,8 @@ export default function AboutMe() {
             whileInView={{ opacity: 1, scale: 1 }}
             className="absolute -bottom-6 -right-2 md:-right-6 glass px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl border-white/10 shadow-xl z-20 max-w-[200px] md:max-w-none"
           >
-            <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Living in Kolkata ,West Bengal ,India</p>
-            <p className="text-white font-bold text-xs md:text-base">An Editor, Devloper  & Cyber Security Analist</p>
+            <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Living in Kolkata, West Bengal, India</p>
+            <p className="text-white font-bold text-xs md:text-base">Software Developer & Cybersecurity Analyst</p>
           </motion.div>
         </motion.div>
 
@@ -100,7 +100,7 @@ export default function AboutMe() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              Beyond security, I've spent years honing my skills in <span className="text-purple-500/80">video editing</span>, photo manipulation, and web development. I believe every digital experience should be both <span className="text-white">secure</span> and <span className="text-white">visually stunning</span>.
+              Beyond security, I've spent years mastering <span className="text-purple-500/80">software engineering</span>, AI automation, and UI/UX architecture. I believe every digital solution should be both <span className="text-white">secure</span> and <span className="text-white">intelligently engineered</span>.
             </motion.p>
 
             <motion.p
@@ -109,7 +109,7 @@ export default function AboutMe() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              My goal is to build innovative solutions that solve real-world problems while maintaining the highest standards of <span className="text-blue-500/80">aesthetics</span>. precision and creativity are the core of every project I undertake.
+              My goal is to build innovative solutions that solve real-world problems while maintaining the highest standards of <span className="text-blue-500/80">performance</span>. Precision and creativity are the core of every project I undertake.
             </motion.p>
           </div>
           
@@ -123,7 +123,7 @@ export default function AboutMe() {
             <div className="px-8 py-6 rounded-2xl bg-black/90 glass backdrop-blur-xl flex flex-col gap-2">
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-orange-500/80">Current Status</span>
               <p className="text-white font-bold text-lg leading-tight">
-                Crafting high-end cinematic experiences & securing digital frontiers.
+                Engineering intelligent software solutions & securing digital frontiers.
               </p>
             </div>
           </motion.div>

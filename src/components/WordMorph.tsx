@@ -6,11 +6,18 @@ import { cn } from "../lib/utils";
 import { useLoading } from "../lib/LoadingContext";
 
 const words = [
-  "Photo Editing",
-  "Video Editing",
-  "Cyber Security",
-  "API & Application Dev",
-  "UI/UX & Web Dev"
+  "Software Engineering",
+  "Artificial Intelligence",
+  "Cybersecurity",
+  "Full-Stack Development",
+  "Computer Vision",
+  "Application Development",
+  "AI Automation",
+  "Creative Coding",
+  "System Design",
+  "UI/UX Engineering",
+  "Open Source",
+  "Digital Innovation"
 ];
 
 const fonts = [

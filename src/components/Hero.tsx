@@ -9,21 +9,21 @@ import { cn } from "../lib/utils";
 import pythonLogo from "../assets/bg_logo/Python-logo-notext.svg.webp";
 import reactLogo from "../assets/bg_logo/React-icon.svg.webp";
 import kaliLogo from "../assets/bg_logo/Kali-dragon-icon.svg.png";
-import premiereLogo from "../assets/bg_logo/Adobe_Premiere_Pro_CC_icon.svg.png";
-import resolveLogo from "../assets/bg_logo/DaVinci_Resolve_Studio.png";
+import dockerLogo from "../assets/bg_logo/docker.svg";
+import typescriptLogo from "../assets/bg_logo/typescript.svg";
 import vscodeLogo from "../assets/bg_logo/Visual_Studio_Code_1.35_icon.svg.webp";
 import wiresharkLogo from "../assets/bg_logo/Wireshark_icon_new.png";
-import capcutLogo from "../assets/bg_logo/capcut-icon.webp";
+import supabaseLogo from "../assets/bg_logo/supabase.svg";
 
 const bgLogos = [
   { src: pythonLogo, color: "rgba(55, 118, 171, 0.2)", size: 80, blur: 0 },
   { src: reactLogo, color: "rgba(97, 218, 251, 0.2)", size: 120, blur: 2 },
   { src: kaliLogo, color: "rgba(49, 120, 198, 0.2)", size: 60, blur: 1 },
-  { src: premiereLogo, color: "rgba(139, 92, 246, 0.2)", size: 100, blur: 3 },
-  { src: resolveLogo, color: "rgba(236, 72, 153, 0.2)", size: 90, blur: 0 },
+  { src: dockerLogo, color: "rgba(36, 150, 237, 0.2)", size: 95, blur: 2 },
+  { src: typescriptLogo, color: "rgba(49, 120, 198, 0.2)", size: 85, blur: 1 },
   { src: vscodeLogo, color: "rgba(0, 120, 215, 0.2)", size: 110, blur: 4 },
   { src: wiresharkLogo, color: "rgba(20, 92, 160, 0.2)", size: 70, blur: 1 },
-  { src: capcutLogo, color: "rgba(255, 255, 255, 0.2)", size: 130, blur: 4 },
+  { src: supabaseLogo, color: "rgba(62, 207, 142, 0.2)", size: 90, blur: 2 },
 ];
 
 const popInAnimation: Variants = {

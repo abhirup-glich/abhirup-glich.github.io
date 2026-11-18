@@ -1,8 +1,10 @@
-import { useState, Suspense, lazy } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLoading } from "./lib/LoadingContext";
 import { cn } from "./lib/utils";
 import { IS_GITHUB_PAGES } from "./lib/api";
+import { projectsData } from "./data/projects";
+import type { ProjectRecord } from "./types/project";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -18,8 +20,8 @@ import Loader from "./components/Loader";
 
 import useSmoothScroll from "./lib/useSmoothScroll";
 
-// Lazy load below-the-fold or conditional routes to keep initial bundle lightweight
-const ProjectPage = lazy(() => import("./components/ProjectPage"));
+// Lazy load detail and admin routes to keep initial bundle lightweight
+const ProjectDetail = lazy(() => import("./components/ProjectDetail"));
 const AdminPage = lazy(() => import("./components/admin/AdminPage"));
 
 function App() {
@@ -29,26 +31,65 @@ function App() {
   const isAdminRoute = typeof window !== "undefined" && 
     (window.location.pathname.toLowerCase() === "/admin" || window.location.pathname.toLowerCase().startsWith("/admin/"));
 
-  const [showProjectPage, setShowProjectPage] = useState<boolean>(() => {
-    if (typeof window === "undefined" || isAdminRoute) return false;
-    return Boolean(new URLSearchParams(window.location.search).get("category"));
-  });
-  const [initialCategory, setInitialCategory] = useState<string>(() => {
-    if (typeof window === "undefined" || isAdminRoute) return "All";
-    return new URLSearchParams(window.location.search).get("category") || "All";
-  });
-
-  const handleOpenProjectPage = (category = "All") => {
-    setInitialCategory(category);
-    setShowProjectPage(true);
+  // Helper to extract initial project from URL (/projects/:slug or ?project=:slug)
+  const getInitialProject = (): ProjectRecord | null => {
+    if (typeof window === "undefined" || isAdminRoute) return null;
+    const path = window.location.pathname;
+    if (path.startsWith("/projects/")) {
+      const slug = path.replace(/^\/projects\/?/, "").split("/")[0].trim().toLowerCase();
+      if (slug) {
+        return projectsData.find((p) => p.slug.toLowerCase() === slug || p.id.toLowerCase() === slug) || null;
+      }
+    }
+    const querySlug = new URLSearchParams(window.location.search).get("project");
+    if (querySlug) {
+      const clean = querySlug.trim().toLowerCase();
+      return projectsData.find((p) => p.slug.toLowerCase() === clean || p.id.toLowerCase() === clean) || null;
+    }
+    return null;
   };
 
-  const handleCloseProjectPage = () => {
-    setShowProjectPage(false);
-    // Clear category from URL when closing
-    const url = new URL(window.location.href);
-    url.searchParams.delete("category");
-    window.history.pushState({}, "", url.toString());
+  const [selectedProject, setSelectedProject] = useState<ProjectRecord | null>(getInitialProject);
+
+  // Sync browser back/forward buttons with project details
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path.startsWith("/projects/")) {
+        const slug = path.replace(/^\/projects\/?/, "").split("/")[0].trim().toLowerCase();
+        if (slug) {
+          const match = projectsData.find((p) => p.slug.toLowerCase() === slug || p.id.toLowerCase() === slug);
+          if (match) {
+            setSelectedProject(match);
+            return;
+          }
+        }
+      }
+      const querySlug = new URLSearchParams(window.location.search).get("project");
+      if (querySlug) {
+        const clean = querySlug.trim().toLowerCase();
+        const match = projectsData.find((p) => p.slug.toLowerCase() === clean || p.id.toLowerCase() === clean);
+        if (match) {
+          setSelectedProject(match);
+          return;
+        }
+      }
+      setSelectedProject(null);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const handleSelectProject = (project: ProjectRecord) => {
+    setSelectedProject(project);
+    const targetUrl = `/projects/${project.slug}`;
+    window.history.pushState({ slug: project.slug }, "", targetUrl);
+  };
+
+  const handleCloseProjectDetail = () => {
+    setSelectedProject(null);
+    window.history.pushState({}, "", "/#projects");
   };
 
   useSmoothScroll();
@@ -95,7 +136,7 @@ function App() {
 
         {/* Persistent Navbar */}
         <AnimatePresence>
-          {!showProjectPage && (
+          {!selectedProject && (
             <Navbar />
           )}
         </AnimatePresence>
@@ -103,13 +144,13 @@ function App() {
         {/* Main Landing Content */}
         <motion.div
           animate={{ 
-            opacity: showProjectPage ? 0 : 1,
-            scale: showProjectPage ? 0.98 : 1,
+            opacity: selectedProject ? 0 : 1,
+            scale: selectedProject ? 0.98 : 1,
           }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className={cn(
             "w-full origin-center",
-            showProjectPage && "pointer-events-none select-none h-screen overflow-hidden"
+            selectedProject && "pointer-events-none select-none h-screen overflow-hidden"
           )}
         >
           <Hero />
@@ -129,10 +170,10 @@ function App() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <Skills onExploreProjects={handleOpenProjectPage} />
+            <Skills />
           </motion.div>
 
-          <Projects onProjectClick={() => handleOpenProjectPage("All")} />
+          <Projects onProjectClick={handleSelectProject} />
 
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -155,25 +196,26 @@ function App() {
           <Footer />
         </motion.div>
 
-        {/* Project Page Overlay */}
+        {/* Project Detail View Overlay */}
         <AnimatePresence>
-          {showProjectPage && (
+          {selectedProject && (
             <motion.div
-              key="project-page"
-              initial={{ opacity: 0, y: 40 }}
+              key="project-detail"
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
+              exit={{ opacity: 0, y: 30 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-3xl overflow-y-auto no-scrollbar"
+              className="fixed inset-0 z-[150] bg-black overflow-y-auto no-scrollbar"
             >
               <Suspense fallback={
                 <div className="min-h-screen bg-black flex items-center justify-center text-white/50 font-mono text-xs uppercase tracking-widest">
-                  Loading Projects...
+                  Loading Project Details...
                 </div>
               }>
-                <ProjectPage 
-                  onBack={handleCloseProjectPage} 
-                  initialCategory={initialCategory}
+                <ProjectDetail 
+                  project={selectedProject}
+                  onBack={handleCloseProjectDetail} 
+                  onSelectProject={handleSelectProject}
                 />
               </Suspense>
             </motion.div>
